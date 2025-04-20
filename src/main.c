@@ -1,35 +1,63 @@
+#if defined (_MSC_VER)
 #include <Windows.h>
+#endif
+#if defined (__MINGW32__)
+#include <windows.h>
+#endif
 
-// Window procedure function prototype
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK WindowProc(HWND window_handle, UINT message, WPARAM wParam, LPARAM lParam) {
 
-// Entry point of the application
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                     LPSTR lpCmdLine, int nCmdShow) {
-    // Register the window class
+    switch (message) {
+        case WM_SIZE: {
+        } break;
+
+        case WM_DESTROY:{
+            PostQuitMessage(0);
+            return 0;
+        } break;
+
+        case WM_CLOSE: {
+            // when x button is clicked
+        } break;
+
+        default: return DefWindowProc(window_handle, message, wParam, lParam);
+    }
+
+    return 0;
+}
+
+
+int APIENTRY WinMain(HINSTANCE Instance, HINSTANCE PrevInstance,
+                     LPSTR CommandLineArgsStr, int CmdShow) {
     const char CLASS_NAME[] = "SampleWindowClass";
 
-    WNDCLASS wc = {0};
+    WNDCLASSEX wc = {0};
 
-    wc.lpfnWndProc   = WindowProc;                  // Window procedure
-    wc.hInstance     = hInstance;                   // Handle to the instance
-    wc.lpszClassName = CLASS_NAME;                  // Class name
-    wc.hCursor       = LoadCursor(NULL, IDC_ARROW); // Cursor type
+    wc.cbSize = sizeof(WNDCLASSEX);
+    wc.style = CS_OWNDC;
+    wc.lpfnWndProc   = WindowProc;
+    wc.cbClsExtra = 0;
+    wc.cbWndExtra = 0;
+    wc.hInstance     = Instance;
+    wc.lpszClassName = CLASS_NAME;
+    wc.hIcon = NULL;
+    wc.hCursor       = NULL;
+    wc.hbrBackground = NULL;
+    wc.lpszMenuName = NULL;
 
-    if (RegisterClass(&wc) == 0) {
+    if (!RegisterClassEx(&wc)) {
         return 0; // Registration failed
     }
 
-    // Create the window
     HWND hwnd = CreateWindowEx(0,                     // Extended styles
                                CLASS_NAME,            // Window class
                                "Simple Win32 Window", // Window title
                                WS_OVERLAPPEDWINDOW,   // Window style
-                               CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-                               CW_USEDEFAULT, // Size and position
+                               CW_USEDEFAULT, CW_USEDEFAULT,
+                               1000, 800,
                                NULL,          // Parent window
                                NULL,          // Menu
-                               hInstance,     // Instance handle
+                               Instance,     // Instance handle
                                NULL           // Additional data
     );
 
@@ -38,7 +66,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
 
     // Show the window
-    ShowWindow(hwnd, nCmdShow);
+    ShowWindow(hwnd, CmdShow);
     UpdateWindow(hwnd);
 
     // Message loop
@@ -49,14 +77,4 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
 
     return (int)msg.wParam;
-}
-
-// Window procedure function
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
-                            LPARAM lParam) {
-    switch (uMsg) {
-    case WM_DESTROY: PostQuitMessage(0); return 0;
-
-    default: return DefWindowProc(hwnd, uMsg, wParam, lParam);
-    }
 }
