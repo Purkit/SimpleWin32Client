@@ -11,9 +11,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(WIN32)
     message(STATUS "Building on Windows...")
-    set_target_properties(Win32App PROPERTIES
-        LINK_FLAGS "/SUBSYSTEM:WINDOWS"
-    )
+    if (MSVC)
+        set_target_properties(Win32App PROPERTIES
+            LINK_FLAGS "/SUBSYSTEM:WINDOWS"
+        )
+    endif()
 
 elseif(UNIX)
     message(STATUS "Building on a Unix-like system ...")
@@ -55,8 +57,6 @@ add_executable(
     Win32App
     ${WIN32_CLIENT_APPLICATION_SOURCES}
 )
-
-
 
 # target_link_libraries(Win32App PRIVATE user32.lib gdi32.lib kernel32.lib)
 target_link_libraries(Win32App PRIVATE user32 gdi32 kernel32)
